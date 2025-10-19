@@ -10,7 +10,11 @@ import json
 
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS
-import google.generativeai as genai
+
+# Importar google-generativeai solo cuando sea necesario (lazy loading)
+def get_genai():
+    import google.generativeai as genai
+    return genai
 
 app = Flask(__name__, static_folder='../public', static_url_path='')
 app.secret_key = os.getenv('SECRET_KEY', 'bus-aprendizaje-python-2025')
@@ -41,6 +45,7 @@ def consulta_gemini(pregunta):
         return None
     
     try:
+        genai = get_genai()
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-2.0-flash')
         
