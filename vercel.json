@@ -1,11 +1,12 @@
 {
-  "buildCommand": "python -m pip install -r requirements.txt",
+  "buildCommand": "",
   "devCommand": "python api/index.py",
   "env": {
     "PYTHONUNBUFFERED": "1"
   },
   "functions": {
     "api/index.py": {
+      "runtime": "python3.9",
       "memory": 1024,
       "maxDuration": 10
     }
