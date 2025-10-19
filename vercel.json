@@ -1,27 +1,27 @@
 {
   "buildCommand": "pip install -r requirements.txt",
-  "devCommand": "python app.py",
+  "devCommand": "python api/index.py",
   "env": {
     "PYTHONUNBUFFERED": "1"
   },
   "functions": {
-    "app.py": {
+    "api/index.py": {
       "memory": 3008,
       "maxDuration": 30
     }
   },
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
     },
     {
-      "src": "/templates/(.*)",
-      "dest": "/templates/$1"
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/app.py"
+      "dest": "/public/index.html"
     }
   ]
 }
