@@ -23,7 +23,13 @@ CORS(app)
 # ========== FUNCIONES PARA GEMINI ==========
 
 def get_gemini_key():
-    """Lee la clave API desde archivo gemini.key"""
+    """Lee la clave API desde variable de entorno o archivo gemini.key"""
+    # Primero intenta desde variable de entorno (Vercel)
+    api_key = os.getenv('GEMINI_API_KEY')
+    if api_key:
+        return api_key
+    
+    # Si no está en variables de entorno, intenta archivo local
     try:
         with open("gemini.key", "r") as f:
             return f.read().strip()
