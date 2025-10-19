@@ -1,0 +1,24 @@
+# Excluir archivos innecesarios del build
+.git
+.gitignore
+.env
+.venv
+__pycache__
+*.pyc
+*.pyo
+.DS_Store
+node_modules
+.pytest_cache
+.coverage
+*.db
+.idea
+.vscode
+*.log
+templates/
+app.py
+gemini.key
+VERCEL_*.md
+build.sh
+init_vercel.*
+DEPLOY_GUIDE.md
+QUICK_START_VERCEL.md
