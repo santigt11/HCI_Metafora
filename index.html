@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="El Bus del Aprendizaje en Python - Un viaje interactivo para aprender Python">
+    <title>🚌 El Bus del Aprendizaje en Python</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <h1 class="header-title">🚌 El Bus del Aprendizaje en Python</h1>
+            <button id="resetBtn" class="reset-btn" title="Reiniciar juego">↻ Reiniciar</button>
+        </header>
+
+        <!-- Main Game Container -->
+        <main class="game-container" role="main">
+            <!-- Left Panel: Map and Bus -->
+            <section class="map-section" aria-label="Mapa del viaje">
+                <div class="route-container">
+                    <div class="route-line"></div>
+                    
+                    <!-- Stops Markers -->
+                    <div class="stops-wrapper" id="stopsWrapper">
+                        <!-- Generado dinámicamente por JS -->
+                    </div>
+
+                    <!-- Bus Element -->
+                    <div class="bus-element" id="busElement" aria-label="Posición actual del bus">
+                        <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Bus body -->
+                            <rect x="10" y="15" width="80" height="35" rx="5" fill="#FF6B6B" stroke="#000" stroke-width="2"/>
+                            <!-- Bus window -->
+                            <circle cx="30" cy="25" r="8" fill="#87CEEB" stroke="#000" stroke-width="1"/>
+                            <!-- Bus wheel -->
+                            <circle cx="25" cy="50" r="8" fill="#333" stroke="#000" stroke-width="1"/>
+                            <circle cx="25" cy="50" r="5" fill="#888"/>
+                            <!-- Bus wheel -->
+                            <circle cx="75" cy="50" r="8" fill="#333" stroke="#000" stroke-width="1"/>
+                            <circle cx="75" cy="50" r="5" fill="#888"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-section">
+                    <label for="progressBar" class="progress-label">Progreso del viaje:</label>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso del viaje"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+
+                <!-- Tires Status -->
+                <div class="tires-section" aria-label="Estado de las llantas">
+                    <h3>Estado del Bus:</h3>
+                    <div class="tires-container" id="tiresContainer">
+                        <!-- Generado dinámicamente por JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel: Current Stop and Agent -->
+            <section class="center-section">
+                <!-- Current Stop Info -->
+                <div class="stop-info" aria-live="polite" aria-atomic="true">
+                    <h2 id="stopTitle" class="stop-title">Cargando...</h2>
+                    <p id="stopDescription" class="stop-description"></p>
+                </div>
+
+                <!-- Agent Dialog (Copiloto) -->
+                <aside class="agent-panel" role="complementary" aria-label="Mensaje del copiloto">
+                    <div class="agent-header">
+                        <span class="agent-icon">🤖</span>
+                        <h3>Copiloto</h3>
+                    </div>
+                    <div class="agent-message" id="agentMessage" role="status" aria-live="assertive">
+                        Inicializando viaje...
+                    </div>
+                </aside>
+
+                <!-- Exercise Container -->
+                <div class="exercise-container" id="exerciseContainer" aria-label="Ejercicio actual" role="region">
+                    <!-- Generado dinámicamente por JS -->
+                </div>
+
+                <!-- Hints Section (appears on wrong answer) -->
+                <div class="hints-section hidden" id="hintsSection" role="alert">
+                    <div class="hint-item" id="standardHint" style="display:none;">
+                        <h4>💭 Pista:</h4>
+                        <p id="standardHintText"></p>
+                    </div>
+                    <div class="hint-item ai-hint" id="aiHint" style="display:none;">
+                        <h4>🤖 IA Asistente:</h4>
+                        <p id="aiHintText"></p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button id="showExerciseBtn" class="btn btn-primary" aria-label="Mostrar ejercicio de la parada actual">
+                        📝 Ver Ejercicio
+                    </button>
+                    <button id="completeBtn" class="btn btn-success" aria-label="Marcar ejercicio como completado" disabled>
+                        ✓ Completado
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Stats -->
+            <section class="stats-section" aria-label="Estadísticas del viaje">
+                <h3>📊 Estadísticas</h3>
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <span class="stat-label">Parada Actual:</span>
+                        <span class="stat-value" id="currentStopStat">1 de 7</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Paradas Completadas:</span>
+                        <span class="stat-value" id="completedStopsStat">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Intentos Fallidos:</span>
+                        <span class="stat-value" id="failedAttemptsStat">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Ejercicios de Refuerzo:</span>
+                        <span class="stat-value" id="refuerzoAttemptsStat">0</span>
+                    </div>
+                </div>
+
+                <div class="tips-section">
+                    <h4>💡 Consejo</h4>
+                    <p id="tipText" class="tip-text">Completa cada ejercicio para avanzar. ¡Cuidado con las llantas!</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Victory Modal -->
+        <div id="victoryModal" class="modal hidden" role="dialog" aria-labelledby="victoryTitle">
+            <div class="modal-content">
+                <h2 id="victoryTitle">🎉 ¡Felicidades!</h2>
+                <p>Has llegado a tu destino: <strong>Aprender a programar en Python (nivel básico).</strong></p>
+                <div class="victory-stats">
+                    <p>Paradas completadas: <strong id="finalStops">7</strong></p>
+                    <p>Intentos fallidos: <strong id="finalFailed">0</strong></p>
+                    <p>Ejercicios de refuerzo: <strong id="finalRefuerzo">0</strong></p>
+                </div>
+                <button class="btn btn-primary" onclick="location.reload()">Jugar de Nuevo</button>
+            </div>
+        </div>
+
+        <!-- Refuerzo Modal -->
+        <div id="refuerzoModal" class="modal hidden" role="dialog" aria-labelledby="refuerzoTitle">
+            <div class="modal-content">
+                <h2 id="refuerzoTitle">🚨 Modo Reparación</h2>
+                <p>Todas las llantas están pinchadas. Debes completar este ejercicio de refuerzo para reparar el bus.</p>
+                <div class="refuerzo-exercise" id="refuerzoExercise">
+                    <!-- Generado dinámicamente por JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app_frontend.js"></script>
+</body>
+</html>

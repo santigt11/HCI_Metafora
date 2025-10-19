@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="El Bus del Aprendizaje en Python - Un viaje interactivo">
+    <title>🚌 El Bus del Aprendizaje en Python</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <h1 class="header-title">🚌 El Bus del Aprendizaje en Python</h1>
+            <button id="resetBtn" class="reset-btn" title="Reiniciar juego">↻ Reiniciar</button>
+        </header>
+
+        <!-- Main Game Container -->
+        <main class="game-container" role="main">
+            <!-- Left Panel: Map and Bus -->
+            <section class="map-section" aria-label="Mapa del viaje">
+                <div class="route-container">
+                    <div class="route-line"></div>
+                    
+                    <!-- Stops Markers -->
+                    <div class="stops-wrapper" id="stopsWrapper">
+                        <!-- Generado dinámicamente -->
+                    </div>
+
+                    <!-- Bus Element -->
+                    <div class="bus-element" id="busElement" aria-label="Posición actual del bus">
+                        <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="15" width="80" height="35" rx="5" fill="#FF6B6B" stroke="#000" stroke-width="2"/>
+                            <circle cx="30" cy="25" r="8" fill="#87CEEB" stroke="#000" stroke-width="1"/>
+                            <circle cx="25" cy="50" r="8" fill="#333" stroke="#000" stroke-width="1"/>
+                            <circle cx="25" cy="50" r="5" fill="#888"/>
+                            <circle cx="75" cy="50" r="8" fill="#333" stroke="#000" stroke-width="1"/>
+                            <circle cx="75" cy="50" r="5" fill="#888"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-section">
+                    <label for="progressBar" class="progress-label">Progreso del viaje:</label>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+
+                <!-- Tires Status -->
+                <div class="tires-section" aria-label="Estado de las llantas">
+                    <h3>Estado del Bus:</h3>
+                    <div class="tires-container" id="tiresContainer">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel: Current Stop and Agent -->
+            <section class="center-section">
+                <!-- Current Stop Info -->
+                <div class="stop-info" aria-live="polite" aria-atomic="true">
+                    <h2 id="stopTitle" class="stop-title">Cargando...</h2>
+                    <p id="stopDescription" class="stop-description"></p>
+                </div>
+
+                <!-- Agent Dialog (Copiloto) -->
+                <aside class="agent-panel" role="complementary" aria-label="Mensaje del copiloto">
+                    <div class="agent-header">
+                        <span class="agent-icon">🤖</span>
+                        <h3>Copiloto</h3>
+                    </div>
+                    <div class="agent-message" id="agentMessage" role="status" aria-live="assertive">
+                        Inicializando viaje...
+                    </div>
+                </aside>
+
+                <!-- Exercise Container -->
+                <div class="exercise-container" id="exerciseContainer" aria-label="Ejercicio actual" role="region">
+                    <!-- Generado dinámicamente -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button id="showExerciseBtn" class="btn btn-primary" aria-label="Mostrar ejercicio">
+                        📝 Ver Ejercicio
+                    </button>
+                    <button id="completeBtn" class="btn btn-success" aria-label="Enviar respuesta" disabled>
+                        ✓ Enviar Respuesta
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Stats -->
+            <section class="stats-section" aria-label="Estadísticas del viaje">
+                <h3>📊 Estadísticas</h3>
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <span class="stat-label">Parada Actual:</span>
+                        <span class="stat-value" id="currentStopStat">1 de 7</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Paradas Completadas:</span>
+                        <span class="stat-value" id="completedStopsStat">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Intentos Fallidos:</span>
+                        <span class="stat-value" id="failedAttemptsStat">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Ejercicios de Refuerzo:</span>
+                        <span class="stat-value" id="refuerzoAttemptsStat">0</span>
+                    </div>
+                </div>
+
+                <div class="tips-section">
+                    <h4>💡 Consejo</h4>
+                    <p id="tipText" class="tip-text">Completa cada ejercicio para avanzar. ¡Cuidado con las llantas!</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Victory Modal -->
+        <div id="victoryModal" class="modal hidden" role="dialog" aria-labelledby="victoryTitle">
+            <div class="modal-content">
+                <h2 id="victoryTitle">🎉 ¡Felicidades!</h2>
+                <p>Has llegado a tu destino: <strong>Aprender Python (nivel básico).</strong></p>
+                <div class="victory-stats">
+                    <p>Paradas completadas: <strong id="finalStops">7</strong></p>
+                    <p>Intentos fallidos: <strong id="finalFailed">0</strong></p>
+                    <p>Ejercicios de refuerzo: <strong id="finalRefuerzo">0</strong></p>
+                </div>
+                <button class="btn btn-primary" onclick="location.reload()">Jugar de Nuevo</button>
+            </div>
+        </div>
+
+        <!-- Refuerzo Modal -->
+        <div id="refuerzoModal" class="modal hidden" role="dialog" aria-labelledby="refuerzoTitle">
+            <div class="modal-content">
+                <h2 id="refuerzoTitle">🚨 Modo Reparación</h2>
+                <p>Todas las llantas están pinchadas. Debes completar este ejercicio de refuerzo.</p>
+                <div class="refuerzo-exercise" id="refuerzoExercise">
+                    <!-- Generado dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/animations.js"></script>
+    <script>
+        // ========== VARIABLES GLOBALES ==========
+        let gameState = null;
+        const API_BASE = 'http://localhost:5000/api';
+
+        // ========== INICIALIZACIÓN ==========
+        async function init() {
+            try {
+                // Verificar que el servidor está disponible
+                const healthCheck = await fetch(`${API_BASE}/health`);
+                if (!healthCheck.ok) throw new Error('Servidor no disponible');
+
+                const health = await healthCheck.json();
+                if (!health.aiEnabled) {
+                    console.warn('⚠️  Gemini AI no configurada. Crea un archivo gemini.key con tu API key.');
+                }
+
+                // Inicializar el juego
+                await initGame();
+                await renderGame();
+
+                // Event listeners
+                setupEventListeners();
+
+                console.log('✓ Juego inicializado correctamente');
+            } catch (error) {
+                console.error('Error al inicializar:', error);
+                showMessage('❌ Error al conectar con el servidor. ¿Está ejecutándose? python app.py', 'error');
+            }
+        }
+
+        async function initGame() {
+            const response = await fetch(`${API_BASE}/init-game`, { method: 'POST' });
+            const data = await response.json();
+            gameState = data.gameState;
+        }
+
+        async function getGameState() {
+            const response = await fetch(`${API_BASE}/game-state`);
+            const data = await response.json();
+            gameState = data.gameState;
+            return gameState;
+        }
+
+        async function renderGame() {
+            await getGameState();
+
+            // Renderizar paradas en el mapa
+            renderStopsMap();
+
+            // Renderizar parada actual
+            const stopResponse = await fetch(`${API_BASE}/current-stop`);
+            const stopData = await stopResponse.json();
+
+            if (stopData.success && stopData.exercise) {
+                const stop = stopData.stop;
+                const exercise = stopData.exercise;
+
+                // Título y descripción
+                document.getElementById('stopTitle').textContent = stop.title;
+                document.getElementById('stopDescription').textContent = stop.description;
+                document.getElementById('tipText').textContent = stop.tip;
+
+                // Renderizar ejercicio
+                renderExercise(exercise);
+
+                // Actualizar stats
+                updateStats();
+
+                // Mensaje del copiloto
+                showAgentMessage(`Bienvenido a: ${stop.title}`);
+            } else if (gameState.currentStopIndex >= 7) {
+                // Victoria
+                showVictoryModal();
+            }
+        }
+
+        function renderStopsMap() {
+            const wrapper = document.getElementById('stopsWrapper');
+            wrapper.innerHTML = '';
+
+            gameState.stops.forEach((stop, idx) => {
+                const marker = document.createElement('div');
+                // Alternar posición: paradas pares arriba, impares abajo
+                const positionClass = idx % 2 === 0 ? 'stop-marker-top' : 'stop-marker-bottom';
+                marker.className = `stop-marker ${positionClass} ${idx === gameState.currentStopIndex ? 'active' : ''} ${stop.completed ? 'completed' : ''}`;
+                // Posicionar horizontalmente (left) usando fórmula corregida: (length - 1) para que último marcador llegue a 100%
+                marker.style.left = (idx / (gameState.stops.length - 1) * 100) + '%';
+                marker.title = stop.title;
+
+                // Crear estructura interna para mejor estética: círculo numérico + nombre
+                const circle = document.createElement('div');
+                circle.className = 'stop-circle';
+                circle.textContent = idx + 1;
+
+                const name = document.createElement('div');
+                name.className = 'stop-name';
+                name.textContent = stop.title;
+
+                marker.appendChild(circle);
+                marker.appendChild(name);
+                wrapper.appendChild(marker);
+            });
+
+            // Posicionar bus horizontalmente (left) - Corregida fórmula para que llegue a 100%
+            const busPercent = (gameState.currentStopIndex / (gameState.stops.length - 1)) * 100;
+            document.getElementById('busElement').style.left = busPercent + '%';
+
+            // Actualizar progress bar
+            document.getElementById('progressBar').style.width = gameState.progress + '%';
+            document.getElementById('progressText').textContent = gameState.progress + '%';
+
+            // Renderizar llantas
+            const tiresContainer = document.getElementById('tiresContainer');
+            tiresContainer.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const tire = document.createElement('div');
+                tire.className = `tire ${i < gameState.tires ? 'good' : 'flat'}`;
+                tire.textContent = i < gameState.tires ? '●' : '✕';
+                tiresContainer.appendChild(tire);
+            }
+        }
+
+        function renderExercise(exercise) {
+            const container = document.getElementById('exerciseContainer');
+            let html = `
+                <div class="exercise-title">Ejercicio</div>
+                <div class="exercise-description">${exercise.question.replace(/\n/g, '<br>')}</div>
+            `;
+
+            if (exercise.type === 'input') {
+                html += `
+                    <div class="exercise-input-group">
+                        <input 
+                            id="exerciseInput" 
+                            type="text" 
+                            class="exercise-input" 
+                            placeholder="Escribe tu respuesta aquí"
+                            aria-label="Campo de respuesta"
+                        >
+                    </div>
+                `;
+            } else if (exercise.type === 'multiple-choice') {
+                html += '<div class="exercise-options">';
+                exercise.options.forEach((option, idx) => {
+                    html += `
+                        <button class="exercise-option" data-option="${idx}" data-value="${option}">
+                            ${option}
+                        </button>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+
+            // Event listeners para opciones
+            if (exercise.type === 'multiple-choice') {
+                document.querySelectorAll('.exercise-option').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.exercise-option').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        document.getElementById('completeBtn').disabled = false;
+                    });
+                });
+            } else if (exercise.type === 'input') {
+                const input = document.getElementById('exerciseInput');
+                if (input) {
+                    input.addEventListener('input', () => {
+                        document.getElementById('completeBtn').disabled = input.value.trim() === '';
+                    });
+                    input.focus();
+                }
+            }
+        }
+
+        async function submitAnswer() {
+            const exercise = gameState.stops[gameState.currentStopIndex].exercises[0];
+            let answer = '';
+
+            if (exercise.type === 'input') {
+                const input = document.getElementById('exerciseInput');
+                answer = input ? input.value : '';
+            } else if (exercise.type === 'multiple-choice') {
+                const selected = document.querySelector('.exercise-option.selected');
+                answer = selected ? selected.dataset.value : '';
+            }
+
+            if (!answer) {
+                showAgentMessage('⚠️ Por favor, proporciona una respuesta');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/submit-answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answer })
+                });
+
+                const result = await response.json();
+
+                if (result.isCorrect) {
+                    // ✅ Respuesta correcta
+                    animateSuccess();
+                    showAgentMessage(`✓ ${result.feedback}`);
+                    
+                    setTimeout(() => {
+                        gameState = result.gameState;
+                        renderGame();
+                    }, 1000);
+                } else {
+                    // ❌ Respuesta incorrecta
+                    animateError();
+                    showAgentMessage(`✗ ${result.feedback}`);
+
+                    // Mostrar pista de IA si está disponible
+                    if (result.aiHint) {
+                        setTimeout(() => {
+                            showAgentMessage(`💡 Pista: ${result.aiHint}`);
+                        }, 500);
+                    }
+
+                    if (result.inRefuerzo) {
+                        setTimeout(() => showRefuerzoModal(), 1500);
+                    } else {
+                        gameState = result;
+                        renderGame();
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAgentMessage('❌ Error al enviar respuesta');
+            }
+        }
+
+        async function submitRefuerzo() {
+            const selected = document.querySelector('#refuerzoExercise .exercise-option.selected');
+            if (!selected) {
+                showAgentMessage('⚠️ Selecciona una opción');
+                return;
+            }
+
+            const answer = selected.dataset.value;
+
+            try {
+                const response = await fetch(`${API_BASE}/submit-refuerzo`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answer })
+                });
+
+                const result = await response.json();
+
+                if (result.isCorrect) {
+                    animateSuccess();
+                    showAgentMessage(`✓ ${result.feedback}`);
+                    gameState = result.gameState;
+
+                    setTimeout(() => {
+                        document.getElementById('refuerzoModal').classList.add('hidden');
+                        renderGame();
+                    }, 1000);
+                } else {
+                    animateError();
+                    showAgentMessage(`✗ ${result.feedback}`);
+
+                    if (result.aiHint) {
+                        setTimeout(() => {
+                            showAgentMessage(`💡 Pista: ${result.aiHint}`);
+                        }, 500);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAgentMessage('❌ Error en refuerzo');
+            }
+        }
+
+        async function showRefuerzoModal() {
+            const response = await fetch(`${API_BASE}/refuerzo-exercise`);
+            const data = await response.json();
+            const exercise = data.exercise;
+
+            let html = `
+                <div class="exercise-title">Ejercicio de Refuerzo</div>
+                <div class="exercise-description">${exercise.question.replace(/\n/g, '<br>')}</div>
+                <div class="exercise-options">
+            `;
+
+            exercise.options.forEach((option, idx) => {
+                html += `<button class="exercise-option" data-option="${idx}" data-value="${option}">${option}</button>`;
+            });
+
+            html += `
+                </div>
+                <button class="btn btn-primary" onclick="submitRefuerzo()" style="width: 100%; margin-top: 20px;">
+                    Reparar Bus
+                </button>
+            `;
+
+            document.getElementById('refuerzoExercise').innerHTML = html;
+
+            document.querySelectorAll('#refuerzoExercise .exercise-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#refuerzoExercise .exercise-option').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                });
+            });
+
+            document.getElementById('refuerzoModal').classList.remove('hidden');
+            showAgentMessage('🚨 Debes completar este ejercicio de refuerzo para reparar el bus.');
+        }
+
+        function showVictoryModal() {
+            const modal = document.getElementById('victoryModal');
+            document.getElementById('finalStops').textContent = gameState.stops.filter(s => s.completed).length;
+            document.getElementById('finalFailed').textContent = gameState.failedAttempts;
+            document.getElementById('finalRefuerzo').textContent = gameState.refuerzoAttempts;
+            modal.classList.remove('hidden');
+            animateSuccess();
+        }
+
+        function updateStats() {
+            const completed = gameState.stops.filter(s => s.completed).length;
+            document.getElementById('currentStopStat').textContent = `${gameState.currentStopIndex + 1} de ${gameState.stops.length}`;
+            document.getElementById('completedStopsStat').textContent = completed;
+            document.getElementById('failedAttemptsStat').textContent = gameState.failedAttempts;
+            document.getElementById('refuerzoAttemptsStat').textContent = gameState.refuerzoAttempts;
+        }
+
+        function showAgentMessage(message) {
+            const elem = document.getElementById('agentMessage');
+            elem.textContent = message;
+            elem.classList.add('pulse');
+            setTimeout(() => elem.classList.remove('pulse'), 600);
+        }
+
+        function showMessage(message, type = 'info') {
+            showAgentMessage(message);
+        }
+
+        function setupEventListeners() {
+            document.getElementById('completeBtn').addEventListener('click', submitAnswer);
+            document.getElementById('resetBtn').addEventListener('click', async () => {
+                if (confirm('¿Deseas reiniciar el juego completamente?')) {
+                    await fetch(`${API_BASE}/reset-game`, { method: 'POST' });
+                    location.reload();
+                }
+            });
+        }
+
+        // Iniciar cuando cargue el DOM
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
